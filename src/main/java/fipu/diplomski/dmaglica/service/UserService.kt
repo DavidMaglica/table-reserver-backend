@@ -192,6 +192,6 @@ class UserService(
         )
     }
 
-    private fun findUserIfExists(email: String) =
+    private fun findUserIfExists(email: String): UserEntity =
         userRepository.findByEmail(email) ?: throw UserNotFoundException("User with email $email does not exist")
 }

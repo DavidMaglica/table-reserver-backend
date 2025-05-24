@@ -24,15 +24,38 @@ class VenueService(
 ) {
 
     @Transactional(readOnly = true)
-    fun get(venueId: Int): VenueEntity =
-        venueRepository.findById(venueId).orElseThrow { SQLException("Venue with id: $venueId not found.") }
+    fun get(venueId: Int): VenueEntity {
+        val venue: VenueEntity =
+            venueRepository.findById(venueId).orElseThrow { SQLException("Venue with id: $venueId not found.") }
+        val venueRating: List<VenueRatingEntity> = venueRatingRepository.findByVenueId(venueId)
+        venue.averageRating = venueRating.map { it.rating }.average()
+        return venue
+    }
 
     @Transactional(readOnly = true)
-    fun getAll(): MutableList<VenueEntity> = venueRepository.findAll()
+    fun getAll(): List<VenueEntity> {
+        val venues: List<VenueEntity> = venueRepository.findAll()
+
+        for (venue in venues) {
+            val ratings = venueRatingRepository.findByVenueId(venue.id).filter { it.venueId == venue.id }
+            if (ratings.isNotEmpty()) {
+                val averageRating = ratings.map { it.rating }.average()
+                venue.averageRating = averageRating
+            } else {
+                venue.averageRating = 0.0
+            }
+        }
+
+        return venues
+    }
 
     @Transactional(readOnly = true)
     fun getType(typeId: Int): String =
         venueTypeRepository.getReferenceById(typeId).type
+
+    @Transactional(readOnly = true)
+    fun getVenueRating(venueId: Int): Double = venueRepository.findById(venueId)
+        .orElseThrow { SQLException("Venue with id: $venueId not found.") }.averageRating
 
     @Transactional(readOnly = true)
     fun getAllTypes(): List<VenueTypeEntity> = venueTypeRepository.findAll()

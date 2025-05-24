@@ -21,12 +21,17 @@ class VenueController(
     ): VenueEntity = venueService.get(venueId)
 
     @GetMapping(Paths.GET_ALL_VENUES)
-    fun getAllVenues(): MutableList<VenueEntity> = venueService.getAll()
+    fun getAllVenues(): List<VenueEntity> = venueService.getAll()
 
     @GetMapping(Paths.GET_VENUE_TYPE)
     fun getVenueType(
         @RequestParam("typeId") typeId: Int,
     ): String = venueService.getType(typeId)
+
+    @GetMapping(Paths.GET_VENUE_RATING)
+    fun getVenueRating(
+        @RequestParam("venueId") venueId: Int,
+    ) = venueService.getVenueRating(venueId)
 
     @GetMapping(Paths.GET_ALL_VENUE_TYPES)
     fun getAllVenueTypes(): List<VenueTypeEntity> = venueService.getAllTypes()
